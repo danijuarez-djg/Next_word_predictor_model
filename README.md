@@ -17,6 +17,21 @@ To train a sequence model on raw text without manual labeling, the problem is fo
 3. **LSTM Layer(s):** Employs memory cells with input, forget, and output gating mechanisms to retain long-range context and address the vanishing gradient problem inherent in standard RNNs.
 4. **Dense Output Layer:** A fully connected layer with a softmax activation function outputting probabilities across the full vocabulary size ($V$).
 
+### Model Architecture & Hyperparameters
+
+| Layer (Type) | Output Shape | Param # | Configuration / Details |
+| :--- | :--- | :--- | :--- |
+| **Embedding** | `(None, max_seq_len - 1, 100)` | `V * 100` | Vector dimension = 100 |
+| **LSTM (Layer 1)** | `(None, max_seq_len - 1, 150)` | ~150K | `return_sequences=True` |
+| **Dropout** | `(None, max_seq_len - 1, 150)` | 0 | `rate = 0.2` (prevents overfitting) |
+| **LSTM (Layer 2)** | `(None, 100)` | ~100K | `return_sequences=False` |
+| **Dense (Output)** | `(None, total_words)` | `100 * V` | Activation = `softmax` |
+
+* **Loss Function:** `categorical_crossentropy`
+* **Optimizer:** `Adam(learning_rate=0.001)`
+* **Batch Size:** `64`
+* **Epochs:** `50`
+
 ### 4. Inference & Generation Strategies
 At runtime, the model receives a seed string and iteratively predicts the next word using one of two decoding methods:
 - **Greedy Search:** Selects the token with the highest argmax probability (deterministic, best for precise completions).
